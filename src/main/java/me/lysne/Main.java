@@ -3,10 +3,12 @@ package me.lysne;
 import me.lysne.audio.AudioManager;
 import me.lysne.graphics.*;
 import me.lysne.graphics.text.Font;
+import me.lysne.graphics.text.TextMesh;
 import me.lysne.window.Display;
 import me.lysne.window.Input;
 import me.lysne.window.Timer;
 import me.lysne.world.World;
+import org.joml.Vector2f;
 import org.joml.Vector3f;
 
 public class Main {
@@ -19,6 +21,9 @@ public class Main {
     private Font font;
 
     private ShaderProgram defaultShader;
+    private ShaderProgram textShader;
+
+    private TextMesh testText;
 
     public Main() {
 
@@ -40,8 +45,12 @@ public class Main {
                 "lightPosition",
                 "lightColor",
                 "skyColor");
+        textShader = new ShaderProgram("text");
+        textShader.registerUniforms("viewProjection", "font");
+        textShader.setUniform("font", 0);
 
         font = new Font(Config.FONT_DIR + "default.fnt");
+        testText = new TextMesh("abcdefghijklmnopqrstuvwxyz", font, 3f, new Vector2f(0 ,0), 12, true)/*.color(0,0,0)*/.build();
     }
 
     private void destroy() {
@@ -49,8 +58,10 @@ public class Main {
         display.destroy();
         audioManager.destroy();
         defaultShader.destroy();
+        textShader.destroy();
         world.destroy();
         font.destroy();
+        testText.destroy();
     }
 
     private void update() {
@@ -68,6 +79,11 @@ public class Main {
         defaultShader.setUniform("view", camera.view);
         defaultShader.setUniform("projection", camera.projection);
         world.draw(defaultShader);
+
+        textShader.use();
+        //textShader.setUniform("viewProjection", camera.ortho);
+        font.bindTexture(0);
+        testText.draw();
 
         display.swap();
     }

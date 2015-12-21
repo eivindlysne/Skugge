@@ -14,7 +14,7 @@ public class Camera {
 
     private float currentPitch = 0;
 
-    private Matrix4f ortho = new Matrix4f().ortho(
+    public Matrix4f ortho = new Matrix4f().ortho(
             0,
             Config.WINDOW_WIDTH,
             0,

@@ -4,6 +4,8 @@ import me.lysne.Config;
 import me.lysne.util.FileUtil;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL12;
+import org.lwjgl.opengl.GL13;
+import org.lwjgl.stb.STBImage;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -13,6 +15,9 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class Font {
+
+    private static final float LINE_HEIGHT = 0.03f;
+    private static final int PADDING = 3;
 
     private static final Pattern WHITESPACE_NOT_IN_QUOTES = Pattern.compile("\\s+(?=([^\"]*\"[^\"]*\")*[^\"]*$)");
     private static final Pattern PROPERTY = Pattern.compile("^([\\w]+)=([\\w|\\W]+)$");
@@ -26,6 +31,12 @@ public class Font {
     private int base;
     private int scaleW;
     private int scaleH;
+
+    private int paddingWidth;
+    private int paddingHeight;
+    private float spaceWidth;
+    private float verticalPerPixelSize;
+    private float horizontalPerPixelSize;
 
     private String textureFile;
     private int textureHandle;
@@ -47,19 +58,34 @@ public class Font {
         GL11.glDeleteTextures(textureHandle);
     }
 
+    public void bindTexture(int unit) {
+
+        GL13.glActiveTexture(GL13.GL_TEXTURE0 + unit);
+        GL11.glBindTexture(GL11.GL_TEXTURE_2D, textureHandle);
+    }
+
+    public Glyph getGlyph(char c) {
+
+        return glyphs.get((int) c);
+    }
+
+    public float spaceWidth() {
+
+        return spaceWidth;
+    }
+
     private void createTexture() {
 
         FileUtil.Image image = FileUtil.loadImageFile(
-                ClassLoader.getSystemResource(Config.FONT_DIR + textureFile).getPath(),
+                ClassLoader.getSystemResource(Config.FONT_DIR + textureFile).getFile(),
                 true
         );
+        System.out.println(ClassLoader.getSystemResource(Config.FONT_DIR + textureFile).getFile());
 
         textureHandle = GL11.glGenTextures();
         GL11.glBindTexture(GL11.GL_TEXTURE_2D, textureHandle);
-        GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_NEAREST);
-        GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_NEAREST);
-        GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_S, GL12.GL_CLAMP_TO_EDGE);
-        GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_T, GL12.GL_CLAMP_TO_EDGE);
+        GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_LINEAR);
+        GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_LINEAR);
         GL11.glTexImage2D(
                 GL11.GL_TEXTURE_2D,
                 0,
@@ -105,6 +131,8 @@ public class Font {
                             String[] paddingS = propertyValue.split(",");
                             for (int i = 0; i < paddingS.length; i++)
                                 padding[i] = Integer.parseInt(paddingS[i]);
+                            paddingWidth = padding[1] + padding[3];
+                            paddingHeight = padding[0] + padding[2];
                             break;
                         case "spacing":
                             String[] spacingS = propertyValue.split(",");
@@ -114,6 +142,9 @@ public class Font {
                         // common
                         case "lineHeight":
                             lineHeight = Integer.parseInt(propertyValue);
+                            int lineHeightPixels = lineHeight - paddingHeight;
+                            verticalPerPixelSize = LINE_HEIGHT / lineHeightPixels;
+                            horizontalPerPixelSize = verticalPerPixelSize / Config.ASPECT_RATIO;
                             break;
                         case "base":
                             base = Integer.parseInt(propertyValue);
@@ -137,30 +168,41 @@ public class Font {
                                 glyph.id = id;
                             break;
                         case "x":
-                            glyph.x = Double.parseDouble(propertyValue);
+                            float x = Float.parseFloat(propertyValue);
+                            glyph.xTexCoord = (x + (padding[1] - PADDING)) / scaleW;
                             break;
                         case "y":
-                            glyph.y = Double.parseDouble(propertyValue);
+                            float y = Float.parseFloat(propertyValue);
+                            glyph.yTexCoord = (y + (padding[0] - PADDING)) / scaleH;
                             break;
                         case "width":
-                            glyph.width = Double.parseDouble(propertyValue);
+                            float width = Float.parseFloat(propertyValue) - (paddingWidth - (2 * PADDING));
+                            glyph.quadWidth = width * horizontalPerPixelSize;
+                            glyph.xTexSize = width / scaleW;
                             break;
                         case "height":
-                            glyph.height = Double.parseDouble(propertyValue);
+                            float height = Float.parseFloat(propertyValue) - (paddingHeight - (2 * PADDING));
+                            glyph.quadHeight = height * verticalPerPixelSize;
+                            glyph.yTexSize = height / scaleH;
                             break;
                         case "xoffset":
-                            glyph.xoffset = Double.parseDouble(propertyValue);
+                            float xoffset = Float.parseFloat(propertyValue);
+                            glyph.xoffset = (xoffset + padding[1] - PADDING) * horizontalPerPixelSize;
                             break;
                         case "yoffset":
-                            glyph.yoffset = Double.parseDouble(propertyValue);
+                            float yoffset = Float.parseFloat(propertyValue);
+                            glyph.yoffset = ((yoffset + padding[0] - PADDING) * verticalPerPixelSize);
                             break;
                         case "xadvance":
-                            glyph.yadvance = Double.parseDouble(propertyValue);
+                            glyph.xadvance = (Float.parseFloat(propertyValue) - paddingWidth) * horizontalPerPixelSize;
                             break;
                     }
                 } else if (s.equals("char") && glyph.id != -1) {
-
-                    glyphs.put(glyph.id, glyph);
+                    if (glyph.id == 32) {
+                        spaceWidth = glyph.xadvance;
+                    } else {
+                        glyphs.put(glyph.id, glyph);
+                    }
                     glyph = new Glyph();
                 }
             }

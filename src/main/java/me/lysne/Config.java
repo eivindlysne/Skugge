@@ -1,6 +1,5 @@
 package me.lysne;
 
-import org.joml.Vector3f;
 import org.joml.Vector4f;
 
 public class Config {
@@ -20,6 +19,7 @@ public class Config {
     // Window
     public static final int WINDOW_WIDTH = 960;
     public static final int WINDOW_HEIGHT = WINDOW_WIDTH / 16 * 9;
+    public static final float ASPECT_RATIO = WINDOW_WIDTH / WINDOW_HEIGHT;
     public static final String WINDOW_TITLE = "Stuff";
 
     // Color
