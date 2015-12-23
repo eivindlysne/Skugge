@@ -32,12 +32,12 @@ public class Glyph {
         float x1 = x0 + (quadWidth * fontSize);
         float y1 = y0 + (quadHeight * fontSize);
 
-        buffer.put(x0).put(y0).put(xTexCoord).put(-yTexCoord - yTexSize).put(color.x).put(color.y).put(color.z);
-        buffer.put(x1).put(y0).put(xTexCoord + xTexSize).put(-yTexCoord - yTexSize).put(color.x).put(color.y).put(color.z);
-        buffer.put(x1).put(y1).put(xTexCoord + xTexSize).put(-yTexCoord).put(color.x).put(color.y).put(color.z);
-        buffer.put(x1).put(y1).put(xTexCoord + xTexSize).put(-yTexCoord).put(color.x).put(color.y).put(color.z);
-        buffer.put(x0).put(y1).put(xTexCoord).put(-yTexCoord).put(color.x).put(color.y).put(color.z);
-        buffer.put(x0).put(y0).put(xTexCoord).put(-yTexCoord - yTexSize).put(color.x).put(color.y).put(color.z);
+        buffer.put(x0).put(y0).put(xTexCoord).put(yTexCoord - yTexSize).put(color.x).put(color.y).put(color.z);
+        buffer.put(x1).put(y0).put(xTexCoord + xTexSize).put(yTexCoord - yTexSize).put(color.x).put(color.y).put(color.z);
+        buffer.put(x1).put(y1).put(xTexCoord + xTexSize).put(yTexCoord).put(color.x).put(color.y).put(color.z);
+        buffer.put(x1).put(y1).put(xTexCoord + xTexSize).put(yTexCoord).put(color.x).put(color.y).put(color.z);
+        buffer.put(x0).put(y1).put(xTexCoord).put(yTexCoord).put(color.x).put(color.y).put(color.z);
+        buffer.put(x0).put(y0).put(xTexCoord).put(yTexCoord - yTexSize).put(color.x).put(color.y).put(color.z);
 
     }
 }

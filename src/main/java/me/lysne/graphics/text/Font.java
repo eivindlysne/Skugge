@@ -173,7 +173,7 @@ public class Font {
                             break;
                         case "y":
                             float y = Float.parseFloat(propertyValue);
-                            glyph.yTexCoord = (y + (padding[0] - PADDING)) / scaleH;
+                            glyph.yTexCoord = -((y + (padding[0] - PADDING)) / scaleH);
                             break;
                         case "width":
                             float width = Float.parseFloat(propertyValue) - (paddingWidth - (2 * PADDING));
