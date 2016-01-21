@@ -28,7 +28,7 @@ public class Camera {
 
     private Transform transform = new Transform();
 
-    // TODO: Move to config
+    // TODO: Move to config?
     private final float fov = (float) Math.toRadians(70);
     private final float zNear = 0.01f;
     private final float zFar = 1000;
@@ -72,11 +72,12 @@ public class Camera {
 
     public void update(Input input) {
 
-        offsetOrientation(
-                -input.getMousedx() * Config.MOUSE_SENSITIVITY,
-                -input.getMousedy() * Config.MOUSE_SENSITIVITY);
-
-        input.centerCursor();
+        if (input.isMouseCaptured()) {
+            offsetOrientation(
+                    -input.getMousedx() * Config.MOUSE_SENSITIVITY,
+                    -input.getMousedy() * Config.MOUSE_SENSITIVITY);
+            input.centerCursor();
+        }
 
         Vector3f direction = new Vector3f(0, 0, 0);
 

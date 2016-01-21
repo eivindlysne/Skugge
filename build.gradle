@@ -16,7 +16,7 @@ repositories {
     }
 }
 
-project.ext.jomlVersion = "1.6.7-SNAPSHOT"
+project.ext.jomlVersion = "1.6.8"
 project.ext.lwjglVersion = "3.0.0b"
 project.ext.jorbisVersion = "0.0.17"
 

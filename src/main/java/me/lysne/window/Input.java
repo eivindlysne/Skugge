@@ -17,6 +17,8 @@ public class Input {
     private Map<Integer, Boolean> keys = new HashMap<>();
     private Map<Integer, Boolean> mouse = new HashMap<>();
 
+    private boolean mouseCaptured = true;
+
     private double centerx = Config.WINDOW_WIDTH / 2;
     private double centery = Config.WINDOW_HEIGHT / 2;
 
@@ -55,6 +57,10 @@ public class Input {
                                 break;
                             case GLFW_KEY_P:
                                 keys.put(GLFW_KEY_P, pressed);
+                                break;
+                            case GLFW_KEY_SPACE:
+                                if (action == GLFW_RELEASE)
+                                    mouseCaptured = !mouseCaptured;
                                 break;
                         }
                     }
@@ -105,5 +111,9 @@ public class Input {
 
     public boolean mouseButtonDown(int mouseButton) {
         return mouse.getOrDefault(mouseButton, false);
+    }
+
+    public boolean isMouseCaptured() {
+        return mouseCaptured;
     }
 }
