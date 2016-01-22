@@ -14,13 +14,17 @@ public class Camera {
 
     private float currentPitch = 0;
 
-    public Matrix4f ortho = new Matrix4f().ortho(
-            0,
+    public Matrix4f ortho = new Matrix4f().ortho2D(
+            0f,
             Config.WINDOW_WIDTH,
-            0,
-            Config.WINDOW_HEIGHT,
-            1,
-            -1);
+            0f,
+            Config.WINDOW_HEIGHT);
+    public Matrix4f orthoUnit = new Matrix4f().ortho2D(
+            0f,
+            1f,
+            0f,
+            1f
+    );
 
     public Matrix4f projection = new Matrix4f();
     public Matrix4f view = new Matrix4f();

@@ -8,6 +8,7 @@ import me.lysne.window.Display;
 import me.lysne.window.Input;
 import me.lysne.window.Timer;
 import me.lysne.world.World;
+import org.joml.Matrix4f;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
 
@@ -46,11 +47,12 @@ public class Main {
                 "lightColor",
                 "skyColor");
         textShader = new ShaderProgram("text");
-        textShader.registerUniforms("viewProjection", "font");
+        textShader.registerUniforms("viewProjection", "model", "font");
         textShader.setUniform("font", 0);
 
         font = new Font(Config.FONT_DIR + "default.fnt");
-        testText = new TextMesh("abcdefghijklmnopqrstuvwxyz", font, 3f, new Vector2f(0 ,0), 12, true)/*.color(0,0,0)*/.build();
+        testText = new TextMesh("FPS: 00", font, 3, new Vector2f(0, Config.WINDOW_HEIGHT), 12, true)
+                .color(1f, 1f, 0f).build();
     }
 
     private void destroy() {
@@ -81,7 +83,8 @@ public class Main {
         world.draw(defaultShader);
 
         textShader.use();
-        //textShader.setUniform("viewProjection", camera.ortho);
+        textShader.setUniform("viewProjection", camera.ortho);
+        textShader.setUniform("model", testText.modelMatrix());
         font.bindTexture(0);
         testText.draw();
 

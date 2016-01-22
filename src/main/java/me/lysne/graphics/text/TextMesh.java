@@ -1,6 +1,9 @@
 package me.lysne.graphics.text;
 
+import me.lysne.Config;
 import me.lysne.graphics.Vertex;
+import me.lysne.window.Input;
+import org.joml.Matrix4f;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
 import org.lwjgl.BufferUtils;
@@ -18,6 +21,7 @@ public class TextMesh {
     private float fontSize;
     private Vector2f position;
     private Vector3f color = new Vector3f(1f, 1f, 1f);
+    private Matrix4f modelMatrix = new Matrix4f();
     private float lineLength;
     private boolean centered;
 
@@ -41,6 +45,9 @@ public class TextMesh {
         this.lineLength = lineLength;
         this.centered = centered;
 
+        modelMatrix.translate(position.x, position.y, 0f);
+        modelMatrix.scale(800 * fontSize, 800 * fontSize, 0);
+
         vao = GL30.glGenVertexArrays();
         vbo = GL15.glGenBuffers();
         drawCount = text.length() * 6;
@@ -61,13 +68,13 @@ public class TextMesh {
         for (char c : text.toCharArray()) {
 
             if (c == 32) {
-                cursorX += font.spaceWidth() * fontSize;
+                cursorX += font.spaceWidth();
                 continue;
             }
 
             Glyph glyph = font.getGlyph(c);
-            glyph.addVerticesTo(buffer, color, fontSize, cursorX, cursorY);
-            cursorX += glyph.xadvance * fontSize;
+            glyph.addVertices(buffer, color, cursorX, cursorY);
+            cursorX += glyph.xadvance;
         }
 
         buffer.flip();
@@ -122,5 +129,9 @@ public class TextMesh {
 
         color.set(r, g, b);
         return this;
+    }
+
+    public Matrix4f modelMatrix() {
+        return modelMatrix;
     }
 }

@@ -3,9 +3,8 @@ package me.lysne.graphics.text;
 import me.lysne.Config;
 import me.lysne.util.FileUtil;
 import org.lwjgl.opengl.GL11;
-import org.lwjgl.opengl.GL12;
 import org.lwjgl.opengl.GL13;
-import org.lwjgl.stb.STBImage;
+import org.lwjgl.opengl.GL30;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -97,6 +96,7 @@ public class Font {
                 GL11.GL_UNSIGNED_BYTE,
                 image.data
         );
+        GL30.glGenerateMipmap(GL11.GL_TEXTURE_2D);
 
         image.destroy();
     }
@@ -191,7 +191,7 @@ public class Font {
                             break;
                         case "yoffset":
                             float yoffset = Float.parseFloat(propertyValue);
-                            glyph.yoffset = ((yoffset + padding[0] - PADDING) * verticalPerPixelSize);
+                            glyph.yoffset = (yoffset + padding[0] - PADDING) * verticalPerPixelSize;
                             break;
                         case "xadvance":
                             glyph.xadvance = (Float.parseFloat(propertyValue) - paddingWidth) * horizontalPerPixelSize;
