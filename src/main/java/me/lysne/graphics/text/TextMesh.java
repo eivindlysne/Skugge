@@ -46,7 +46,7 @@ public class TextMesh {
         this.centered = centered;
 
         modelMatrix.translate(position.x, position.y, 0f);
-        modelMatrix.scale(800 * fontSize, 800 * fontSize, 0);
+        modelMatrix.scale(400 * fontSize, 400 * fontSize, 0);
 
         vao = GL30.glGenVertexArrays();
         vbo = GL15.glGenBuffers();

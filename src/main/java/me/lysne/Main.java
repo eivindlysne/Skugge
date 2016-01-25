@@ -50,8 +50,8 @@ public class Main {
         textShader.registerUniforms("viewProjection", "model", "font");
         textShader.setUniform("font", 0);
 
-        font = new Font(Config.FONT_DIR + "default.fnt");
-        testText = new TextMesh("FPS: 00", font, 3, new Vector2f(0, Config.WINDOW_HEIGHT), 12, true)
+        font = new Font(Config.FONT_DIR + "signed.fnt");
+        testText = new TextMesh("FPS: 00", font, 2, new Vector2f(0, Config.WINDOW_HEIGHT), 12, true)
                 .color(1f, 1f, 0f).build();
     }
 

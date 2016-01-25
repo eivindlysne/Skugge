@@ -16,7 +16,7 @@ import java.util.regex.Pattern;
 public class Font {
 
     private static final float LINE_HEIGHT = 0.03f;
-    private static final int PADDING = 3;
+    private static final int PADDING = 8; // Same as when creating the font!
 
     private static final Pattern WHITESPACE_NOT_IN_QUOTES = Pattern.compile("\\s+(?=([^\"]*\"[^\"]*\")*[^\"]*$)");
     private static final Pattern PROPERTY = Pattern.compile("^([\\w]+)=([\\w|\\W]+)$");
@@ -96,7 +96,7 @@ public class Font {
                 GL11.GL_UNSIGNED_BYTE,
                 image.data
         );
-        GL30.glGenerateMipmap(GL11.GL_TEXTURE_2D);
+        //GL30.glGenerateMipmap(GL11.GL_TEXTURE_2D); // TODO: Giving us anything?
 
         image.destroy();
     }
