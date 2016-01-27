@@ -4,7 +4,6 @@ import me.lysne.Config;
 import me.lysne.util.FileUtil;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL13;
-import org.lwjgl.opengl.GL30;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -79,7 +78,6 @@ public class Font {
                 ClassLoader.getSystemResource(Config.FONT_DIR + textureFile).getFile(),
                 true
         );
-        System.out.println(ClassLoader.getSystemResource(Config.FONT_DIR + textureFile).getFile());
 
         textureHandle = GL11.glGenTextures();
         GL11.glBindTexture(GL11.GL_TEXTURE_2D, textureHandle);

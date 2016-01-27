@@ -171,4 +171,63 @@ public class TerrainGenerator {
         }
         return new MeshData(vertices, indices);
     }
+
+    public static MeshData generateWaterMesh(int xUnits, int zUnits) {
+
+        final Vector3f waterColor = new Vector3f(0f, 0f, 1f);
+        final Vector3f up = new Vector3f(0f, 1f, 0f);
+        Vertex[] vertices = new Vertex[xUnits * zUnits * 6];
+        int[] indices = new int[xUnits * zUnits * 6];
+        float plane = -10;
+        float y = plane / 1.0f - 2f;
+        xUnits /= 2f;
+        zUnits /= 2f;
+        int vx = 0, ix = 0;
+        for (int i = -zUnits; i < zUnits; i += 1) {
+            for (int j = -xUnits; j < xUnits; j += 1) {
+
+                float x0 = j, x1 = x0 + 1f;
+                float z0 = -i, z1 = z0 - 1f;
+
+                vertices[vx  ] = new Vertex(new Vector3f(x0, y, z0), waterColor, up);
+                vertices[vx+1] = new Vertex(new Vector3f(x1, y, z0), waterColor, up);
+                vertices[vx+2] = new Vertex(new Vector3f(x1, y, z1), waterColor, up);
+                vertices[vx+3] = new Vertex(new Vector3f(x1, y, z1), waterColor, up);
+                vertices[vx+4] = new Vertex(new Vector3f(x0, y, z1), waterColor, up);
+                vertices[vx+5] = new Vertex(new Vector3f(x0, y, z0), waterColor, up);
+
+                indices[ix++] = vx;
+                indices[ix++] = vx + 1;
+                indices[ix++] = vx + 2;
+                indices[ix++] = vx + 3;
+                indices[ix++] = vx + 4;
+                indices[ix++] = vx + 5;
+
+                vx += 6;
+            }
+        }
+        return new MeshData(vertices, indices);
+    }
+
+    public static MeshData generateWaterMesh(final Transform t, int xUnits, int zUnits) {
+
+        final Vector3f waterColor = new Vector3f(0f, 0f, 1f);
+        final Vector3f up = new Vector3f(0f, 1f, 0f);
+        float plane = -10;
+        xUnits /= 2f;
+        zUnits /= 2f;
+        float x0 = -xUnits, x1 = x0 + xUnits;
+        float y = plane / 1.0f +2f;
+        float z0 = zUnits, z1 = z0 - zUnits;
+        Vertex[] vertices = new Vertex[] {
+                new Vertex(new Vector3f(x0, y, z0), waterColor, up),
+                new Vertex(new Vector3f(x1, y, z0), waterColor, up),
+                new Vertex(new Vector3f(x1, y, z1), waterColor, up),
+                new Vertex(new Vector3f(x0, y, z1), waterColor, up),
+        };
+        int[] indices = new int[] {
+            0, 1, 2, 2, 3, 0,
+        };
+        return new MeshData(vertices, indices);
+    }
 }

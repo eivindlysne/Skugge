@@ -2,6 +2,7 @@ package me.lysne;
 
 import me.lysne.audio.AudioManager;
 import me.lysne.graphics.*;
+import me.lysne.graphics.buffer.FramebufferObject;
 import me.lysne.graphics.text.Font;
 import me.lysne.graphics.text.TextMesh;
 import me.lysne.window.Display;
@@ -23,6 +24,9 @@ public class Main {
 
     private ShaderProgram defaultShader;
     private ShaderProgram textShader;
+    private ShaderProgram fboShader;
+
+    private FramebufferObject testFBO;
 
     private TextMesh testText;
 
@@ -45,14 +49,22 @@ public class Main {
                 "transform.scale",
                 "lightPosition",
                 "lightColor",
-                "skyColor");
+                "skyColor"
+        );
+
         textShader = new ShaderProgram("text");
         textShader.registerUniforms("viewProjection", "model", "font");
         textShader.setUniform("font", 0);
 
+        fboShader = new ShaderProgram("fbo");
+        fboShader.registerUniforms("fboTexture");
+        fboShader.setUniform("fboTexture", 0);
+
         font = new Font(Config.FONT_DIR + "signed.fnt");
         testText = new TextMesh("FPS: 00", font, 2, new Vector2f(0, Config.WINDOW_HEIGHT), 12, true)
                 .color(0f, 0f, 0f).build();
+
+        testFBO = new FramebufferObject().withColorAttachment().withDepthAttachment().build();
     }
 
     private void destroy() {
@@ -61,9 +73,11 @@ public class Main {
         audioManager.destroy();
         defaultShader.destroy();
         textShader.destroy();
+        fboShader.destroy();
         world.destroy();
         font.destroy();
         testText.destroy();
+        testFBO.destroy();
     }
 
     private void update() {
@@ -76,11 +90,17 @@ public class Main {
     private void render() {
         display.clear();
 
-        // Rendering
         defaultShader.use();
         defaultShader.setUniform("view", camera.view);
         defaultShader.setUniform("projection", camera.projection);
+
+        testFBO.bind();
+        testFBO.clear();
         world.draw(defaultShader);
+        testFBO.unbind();
+
+        fboShader.use();
+        testFBO.draw();
 
         textShader.use();
         textShader.setUniform("viewProjection", camera.ortho);

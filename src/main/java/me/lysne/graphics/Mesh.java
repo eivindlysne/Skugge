@@ -19,16 +19,25 @@ public class Mesh {
     private int drawCount = 0;
 
     public Mesh(MeshData meshData, DrawHint drawHint) {
-        this(meshData.vertices, meshData.indices, drawHint);
+        this(meshData.vertices, meshData.indices, drawHint, true);
+    }
+
+    public Mesh(MeshData meshData, DrawHint drawHint, boolean calculateNormals) {
+        this(meshData.vertices, meshData.indices, drawHint, calculateNormals);
     }
 
     public Mesh(Vertex[] vertices, int[] indices, DrawHint drawHint) {
+        this(vertices, indices, drawHint, true);
+    }
+
+    public Mesh(Vertex[] vertices, int[] indices, DrawHint drawHint, boolean calculateNormals) {
 
         vao = GL30.glGenVertexArrays();
         vbo = GL15.glGenBuffers();
         ibo = GL15.glGenBuffers();
 
-        calculateNormals(vertices, indices);
+        if (calculateNormals)
+            calculateNormals(vertices, indices);
 
         drawCount = indices.length;
 

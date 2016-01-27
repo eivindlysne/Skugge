@@ -15,6 +15,7 @@ public class Region {
     public Coord coord;
 
     private Mesh mesh;
+    private Mesh waterMesh;
     private Transform transform;
 
     public Region(Coord coord, World world) {
@@ -26,11 +27,15 @@ public class Region {
         transform.position.set((coord.x * REGION_SIZE_X), 0, (coord.z * REGION_SIZE_Z));
 
         mesh = new Mesh(
-                TerrainGenerator.generateRegionMesh(
-                        this.transform,
-                        REGION_SIZE_X, REGION_SIZE_Z,
-                        4f /* Feature size */),
-                DrawHint.STATIC);
+                TerrainGenerator.generateRegionMesh(this.transform, REGION_SIZE_X, REGION_SIZE_Z, 8f /* Feature size */),
+                DrawHint.STATIC
+        );
+
+        waterMesh = new Mesh(
+                TerrainGenerator.generateWaterMesh(REGION_SIZE_X, REGION_SIZE_Z),
+                DrawHint.STATIC,
+                false
+        );
     }
 
     public void destroy() {
@@ -43,5 +48,6 @@ public class Region {
         shader.setUniform(Transform.mul(world.transform, transform));
 
         mesh.draw();
+        waterMesh.draw();
     }
 }
