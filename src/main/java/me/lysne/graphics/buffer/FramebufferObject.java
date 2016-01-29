@@ -1,9 +1,11 @@
 package me.lysne.graphics.buffer;
 
 import me.lysne.Config;
-import me.lysne.graphics.Vertex;
+import me.lysne.window.Display;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
+import org.lwjgl.opengl.GL12;
+import org.lwjgl.opengl.GL13;
 import org.lwjgl.opengl.GL14;
 import org.lwjgl.opengl.GL15;
 import org.lwjgl.opengl.GL20;
@@ -27,11 +29,11 @@ public class FramebufferObject {
     private int handle;
     private int colorAttachment = -1;
     private int depthAttachment = -1;
+    private int depthRenderBuffer = -1;
 
     private int vao;
     private int vbo;
-    // TODO: Do we gain anything from using an index buffer here?
-    //private int ibo;
+    // TODO: Would we gain anything from using an index buffer here?
 
     private int width;
     private int height;
@@ -49,11 +51,19 @@ public class FramebufferObject {
         GL30.glDeleteFramebuffers(handle);
         GL30.glDeleteVertexArrays(vao);
         GL15.glDeleteBuffers(vbo);
+
+        if (colorAttachment != -1)
+            GL11.glDeleteTextures(colorAttachment);
+        if (depthAttachment != -1)
+            GL11.glDeleteTextures(depthAttachment);
+        if (depthRenderBuffer != -1)
+            GL30.glDeleteRenderbuffers(depthRenderBuffer);
     }
 
     public FramebufferObject withColorAttachment() {
 
         bind();
+        GL20.glDrawBuffers(GL20.GL_DRAW_BUFFER0);
 
         colorAttachment = GL11.glGenTextures();
 
@@ -123,9 +133,31 @@ public class FramebufferObject {
         return this;
     }
 
+    public FramebufferObject withDepthRenderBuffer() {
+
+        bind();
+
+        depthRenderBuffer = GL30.glGenRenderbuffers();
+
+        GL30.glBindRenderbuffer(GL30.GL_RENDERBUFFER, depthRenderBuffer);
+        GL30.glRenderbufferStorage(GL30.GL_RENDERBUFFER, GL14.GL_DEPTH_COMPONENT24, width, height);
+
+        GL30.glFramebufferRenderbuffer(
+                GL30.GL_FRAMEBUFFER,
+                GL30.GL_DEPTH_ATTACHMENT,
+                GL30.GL_RENDERBUFFER,
+                depthRenderBuffer
+        );
+
+        unbind();
+
+        return this;
+    }
+
     public FramebufferObject build() {
 
-        // TODO: glDrawBuffers?
+        if (!isComplete())
+            System.err.println("Framebuffer not complete!");
 
         vao = GL30.glGenVertexArrays();
         vbo = GL15.glGenBuffers();
@@ -177,11 +209,19 @@ public class FramebufferObject {
     public void bind() {
 
         GL30.glBindFramebuffer(GL30.GL_FRAMEBUFFER, handle);
+        GL11.glViewport(0, 0, width, height);
     }
 
     public void unbind() {
 
         GL30.glBindFramebuffer(GL30.GL_FRAMEBUFFER, 0);
+        GL11.glViewport(0, 0, Config.WINDOW_WIDTH, Config.WINDOW_HEIGHT);
+    }
+
+    public void bindColorAttachment(int unit) {
+
+        GL13.glActiveTexture(GL13.GL_TEXTURE0 + unit);
+        GL11.glBindTexture(GL11.GL_TEXTURE_2D, colorAttachment);
     }
 
     public boolean isComplete() {
@@ -191,8 +231,13 @@ public class FramebufferObject {
 
     public void clear() {
 
-        // TODO: Check which buffer we have first
-        GL11.glClear(GL11.GL_COLOR_BUFFER_BIT | GL11.GL_DEPTH_BUFFER_BIT);
+        int bitMask = 0;
+        if (colorAttachment != -1)
+            bitMask |= GL11.GL_COLOR_BUFFER_BIT;
+        if (depthAttachment != -1 || depthRenderBuffer != -1)
+            bitMask |= GL11.GL_DEPTH_BUFFER_BIT;
+
+        GL11.glClear(bitMask);
     }
 
     public void draw() {
@@ -202,5 +247,10 @@ public class FramebufferObject {
         GL30.glBindVertexArray(vao);
         GL11.glDrawArrays(GL11.GL_TRIANGLES, 0, 6);
         GL30.glBindVertexArray(0);
+    }
+
+    public static void unbindCurrent() {
+
+        GL30.glBindFramebuffer(GL30.GL_FRAMEBUFFER, 0);
     }
 }

@@ -4,6 +4,7 @@ import me.lysne.Config;
 import org.lwjgl.glfw.*;
 import org.lwjgl.opengl.GL;
 import org.lwjgl.opengl.GL11;
+import org.lwjgl.opengl.GL30;
 import org.lwjgl.opengl.GL32;
 
 import static org.lwjgl.glfw.GLFW.*;
@@ -43,7 +44,7 @@ public class Display {
         glfwWindowHint(GLFW_VISIBLE, GL11.GL_FALSE);
         glfwWindowHint(GLFW_RESIZABLE, GL11.GL_FALSE);
         glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-        glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);
+        glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
         glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
         glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GL11.GL_TRUE);
 
@@ -67,7 +68,8 @@ public class Display {
                 Config.SKY_COLOR.x,
                 Config.SKY_COLOR.y,
                 Config.SKY_COLOR.z,
-                Config.SKY_COLOR.w);
+                Config.SKY_COLOR.w
+        );
 
         GL11.glViewport(0, 0, width, height);
 
@@ -81,6 +83,8 @@ public class Display {
 
         GL11.glEnable(GL11.GL_CULL_FACE);
         GL11.glCullFace(GL11.GL_BACK);
+
+//        GL11.glEnable(GL30.GL_CLIP_DISTANCE0);
     }
 
     public void destroy() {
@@ -130,5 +134,9 @@ public class Display {
 
     public long getHandle() {
         return handle;
+    }
+
+    public void setTitle(String title) {
+        glfwSetWindowTitle(handle, title);
     }
 }

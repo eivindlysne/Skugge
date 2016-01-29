@@ -43,11 +43,15 @@ public class Region {
         mesh.destroy();
     }
 
-    public void draw(ShaderProgram shader) {
+    public void drawTerrain(ShaderProgram shader) {
 
         shader.setUniform(Transform.mul(world.transform, transform));
-
         mesh.draw();
+    }
+
+    public void drawWater(ShaderProgram shader) {
+
+        shader.setUniform(Transform.mul(world.transform, transform));
         waterMesh.draw();
     }
 }

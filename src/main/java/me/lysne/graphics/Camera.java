@@ -32,7 +32,7 @@ public class Camera {
 
     private Transform transform = new Transform();
 
-    // TODO: Move to config?
+    // TODO: Move to config
     private final float fov = (float) Math.toRadians(70);
     private final float zNear = 0.01f;
     private final float zFar = 1000;
@@ -47,12 +47,12 @@ public class Camera {
     }
 
     // Internal objects to reduce allocation every frame
-    private Quaternionf tempQ1 = new Quaternionf();
-    private Quaternionf tempQ2 = new Quaternionf();
-    private Vector3f tempV1 = new Vector3f();
-    private Vector3f tempV2 = new Vector3f();
-    private Matrix4f tempM1 = new Matrix4f();
-    private Matrix4f tempM2 = new Matrix4f();
+    private final Quaternionf tempQ1 = new Quaternionf();
+    private final Quaternionf tempQ2 = new Quaternionf();
+    private final Vector3f tempV1 = new Vector3f();
+    private final Vector3f tempV2 = new Vector3f();
+    private final Matrix4f tempM1 = new Matrix4f();
+    private final Matrix4f tempM2 = new Matrix4f();
 
     private void offsetOrientation(double yawDegrees, double pitchDegrees) {
 
@@ -79,7 +79,8 @@ public class Camera {
         if (input.isMouseCaptured()) {
             offsetOrientation(
                     -input.getMousedx() * Config.MOUSE_SENSITIVITY,
-                    -input.getMousedy() * Config.MOUSE_SENSITIVITY);
+                    -input.getMousedy() * Config.MOUSE_SENSITIVITY
+            );
             input.centerCursor();
         }
 
@@ -113,5 +114,24 @@ public class Camera {
 
     public Quaternionf getOrientation() {
         return transform.orientation;
+    }
+
+    public Matrix4f mirrorHorizontalPosition(float mirrorY) {
+
+        Vector3f invertedYposition = tempV1.set(transform.position);
+        invertedYposition.y -= 2 * (invertedYposition.y - mirrorY);
+
+        Quaternionf invertedYRotation = tempQ1.set(transform.orientation);
+        invertedYRotation.rotateY(
+                -((float) Math.asin(2.0 * (
+                        invertedYRotation.x*invertedYRotation.z + invertedYRotation.y*invertedYRotation.w
+                )))
+        );
+
+        Matrix4f invertedView = tempM1.identity();
+        invertedView.scale(tempV2.set(1, 1, 1).div(transform.scale))
+                .mul(tempM2.identity().rotation(invertedYRotation.conjugate()))
+                .mul(tempM2.identity().translate(invertedYposition.negate()));
+        return invertedView;
     }
 }

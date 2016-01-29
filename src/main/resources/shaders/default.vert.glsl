@@ -13,6 +13,8 @@ vec3 quaternion_rotate(vec4 q, vec3 v) {
 const float fogDensity = 0.0035;
 const float fogGradient = 5.0;
 
+uniform vec4 clipPlane; // = vec4(0, -1, 0, -12);
+
 uniform mat4 view;
 uniform mat4 projection;
 
@@ -31,20 +33,17 @@ out float vVisibility;
 
 void main() {
 
-    vec3 position = transform.position + quaternion_rotate(
-        transform.orientation, transform.scale * aPosition);
+    vec3 position = transform.position + quaternion_rotate(transform.orientation, transform.scale * aPosition);
 
     vec4 positionRelativeToCam = view * vec4(position, 1.0);
     float distanceFromCam = length(positionRelativeToCam.xyz);
 
     gl_Position = projection * positionRelativeToCam;
-
+    gl_ClipDistance[0] = dot(vec4(position, 1.0), clipPlane);
 
     vPosition = aPosition;
     vColor = aColor;
-    vNormal = quaternion_rotate(
-        transform.orientation, transform.scale * aNormal);
+    vNormal = quaternion_rotate(transform.orientation, transform.scale * aNormal);
     vToLight = lightPosition - position;
-    vVisibility = clamp(
-        exp(-pow((distanceFromCam * fogDensity), fogGradient)), 0, 1);
+    vVisibility = clamp(exp(-pow((distanceFromCam * fogDensity), fogGradient)), 0, 1);
 }

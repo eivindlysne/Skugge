@@ -2,14 +2,12 @@ package me.lysne;
 
 import me.lysne.audio.AudioManager;
 import me.lysne.graphics.*;
-import me.lysne.graphics.buffer.FramebufferObject;
 import me.lysne.graphics.text.Font;
 import me.lysne.graphics.text.TextMesh;
 import me.lysne.window.Display;
 import me.lysne.window.Input;
 import me.lysne.window.Timer;
 import me.lysne.world.World;
-import org.joml.Matrix4f;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
 
@@ -22,11 +20,9 @@ public class Main {
     private World world;
     private Font font;
 
-    private ShaderProgram defaultShader;
+    private ShaderProgram terrainShader;
     private ShaderProgram textShader;
     private ShaderProgram fboShader;
-
-    private FramebufferObject testFBO;
 
     private TextMesh testText;
 
@@ -39,11 +35,11 @@ public class Main {
         audioManager = new AudioManager();
 
         world = new World();
-        defaultShader = new ShaderProgram("default");
-        //defaultShader = new ShaderProgram("cel");
-        defaultShader.registerUniforms(
+        terrainShader = new ShaderProgram("default");
+        terrainShader.registerUniforms(
                 "view",
                 "projection",
+                "clipPlane",
                 "transform.position",
                 "transform.orientation",
                 "transform.scale",
@@ -63,21 +59,18 @@ public class Main {
         font = new Font(Config.FONT_DIR + "signed.fnt");
         testText = new TextMesh("FPS: 00", font, 2, new Vector2f(0, Config.WINDOW_HEIGHT), 12, true)
                 .color(0f, 0f, 0f).build();
-
-        testFBO = new FramebufferObject().withColorAttachment().withDepthAttachment().build();
     }
 
     private void destroy() {
 
         display.destroy();
         audioManager.destroy();
-        defaultShader.destroy();
+        terrainShader.destroy();
         textShader.destroy();
         fboShader.destroy();
         world.destroy();
         font.destroy();
         testText.destroy();
-        testFBO.destroy();
     }
 
     private void update() {
@@ -88,19 +81,12 @@ public class Main {
     }
 
     private void render() {
+
         display.clear();
 
-        defaultShader.use();
-        defaultShader.setUniform("view", camera.view);
-        defaultShader.setUniform("projection", camera.projection);
 
-        testFBO.bind();
-        testFBO.clear();
-        world.draw(defaultShader);
-        testFBO.unbind();
+        world.draw(camera, terrainShader, fboShader);
 
-        fboShader.use();
-        testFBO.draw();
 
         textShader.use();
         textShader.setUniform("viewProjection", camera.ortho);

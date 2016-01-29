@@ -3,7 +3,11 @@ package me.lysne.world;
 import me.lysne.graphics.Camera;
 import me.lysne.graphics.ShaderProgram;
 import me.lysne.graphics.Transform;
+import me.lysne.graphics.buffer.FramebufferObject;
 import org.joml.Vector3f;
+import org.joml.Vector4f;
+import org.lwjgl.opengl.GL11;
+import org.lwjgl.opengl.GL30;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -11,13 +15,26 @@ import java.util.Map;
 
 public class World {
 
+    public static final float WATER_LEVEL = -10f;
+
     public Transform transform = new Transform();
+
+    private ShaderProgram waterShader;
 
     private Region currentRegion;
     private Map<Coord, Region> regions = new HashMap<>();
     private ArrayList<BaseLight> lights = new ArrayList<>();
 
+    private FramebufferObject reflectionBuffer;
+    private FramebufferObject refractionBuffer;
+    private Vector4f clipPlane = new Vector4f();
+
     public World() {
+
+        waterShader = new ShaderProgram("water");
+        waterShader.registerUniforms("reflection", "refraction");
+//        waterShader.setUniform("reflection", 0);
+//        waterShader.setUniform("refraction", 1);
 
         createRegion(-1, -1);
         createRegion( 0, -1);
@@ -32,12 +49,20 @@ public class World {
         createRegion( 1,  1);
 
         lights.add(new BaseLight(new Vector3f(0, 0, -10), new Vector3f(1, 1, 1)));
+
+        reflectionBuffer = new FramebufferObject().withColorAttachment().withDepthRenderBuffer().build();
+        refractionBuffer = new FramebufferObject().withColorAttachment().withDepthAttachment().build();
     }
 
     public void destroy() {
 
         regions.forEach(((coord, region) -> region.destroy()));
         lights.forEach(BaseLight::destroy);
+
+        reflectionBuffer.destroy();
+        refractionBuffer.destroy();
+
+        waterShader.destroy();
     }
 
     private Region createRegion(int x, int z) {
@@ -83,13 +108,54 @@ public class World {
         }
     }
 
-    public void draw(ShaderProgram shader) {
+    public void draw(Camera camera, ShaderProgram terrainShader, ShaderProgram screenShader) {
 
-        BaseLight l = lights.get(0);
-        shader.setUniform("lightPosition", l.transform.position);
-        shader.setUniform("lightColor", l.color);
+        GL11.glEnable(GL30.GL_CLIP_DISTANCE0);
 
-        regions.forEach((coord, region) -> region.draw(shader));
-        lights.forEach(light -> light.draw(shader));
+        // TODO: Invert for reflection
+        terrainShader.use();
+
+        // TODO: We only have one light atm
+        BaseLight light = lights.get(0);
+        terrainShader.setUniform("lightPosition", light.transform.position);
+        terrainShader.setUniform("lightColor", light.color);
+
+        terrainShader.setUniform("projection", camera.projection);
+
+
+        reflectionBuffer.bind();
+        reflectionBuffer.clear();
+        clipPlane.set(0f, 1f, 0f, -WATER_LEVEL);
+        terrainShader.setUniform("view", camera.mirrorHorizontalPosition(WATER_LEVEL)); // TODO: Probably not correct
+//        terrainShader.setUniform("view", camera.view);
+        terrainShader.setUniform("clipPlane", clipPlane);
+        for (Region region : regions.values())
+            region.drawTerrain(terrainShader);
+
+        refractionBuffer.bind();
+        refractionBuffer.clear();
+        clipPlane.set(0f, -1f, 0f, WATER_LEVEL);
+        terrainShader.setUniform("view", camera.view);
+        terrainShader.setUniform("clipPlane", clipPlane);
+        for (Region region : regions.values())
+            region.drawTerrain(terrainShader);
+
+        FramebufferObject.unbindCurrent();
+        GL11.glDisable(GL30.GL_CLIP_DISTANCE0);
+
+//        for (Region region : regions.values())
+//            region.drawTerrain(terrainShader);
+
+//        waterShader.use();
+//        reflectionBuffer.bindColorAttachment(0);
+//        refractionBuffer.bindColorAttachment(1);
+
+//        light.draw(terrainShader);
+
+
+        screenShader.use();
+        reflectionBuffer.draw();
+//        refractionBuffer.draw();
+
     }
 }
