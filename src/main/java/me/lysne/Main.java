@@ -1,7 +1,8 @@
 package me.lysne;
 
 import me.lysne.audio.AudioManager;
-import me.lysne.graphics.*;
+import me.lysne.graphics.Camera;
+import me.lysne.graphics.ShaderProgram;
 import me.lysne.graphics.text.Font;
 import me.lysne.graphics.text.TextMesh;
 import me.lysne.window.Display;

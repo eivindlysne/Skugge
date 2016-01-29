@@ -28,15 +28,15 @@ public class TerrainGenerator {
 
     private static Vector3f colorFromHeight(float height) {
 
-//        Vector3f dst = new Vector3f();
-//        if (height < -5) dst.set(0.40f, 0.47f, 0.79f);
-//        else if (height < -4) dst.set(0.93f, 0.84f, 0.72f);
-//        else if (height < 1) dst.set(0.14f, 0.41f, 0.18f);
-//        else if (height < 2) dst.set(0.15f, 0.69f, 0.21f);
-//        else if (height < 4) dst.set(0.5f, 0.51f, 0.53f);
-//        else dst.set(0.9f, 0.9f, 1);
-//        return dst;
-        return new Vector3f(0.15f, 0.69f, 0.21f);
+        Vector3f dst = new Vector3f();
+        if (height < -5) dst.set(0.73f, 0.64f, 0.52f);
+        else if (height < -4) dst.set(0.93f, 0.84f, 0.72f);
+        else if (height < 1) dst.set(0.14f, 0.41f, 0.18f);
+        else if (height < 2) dst.set(0.15f, 0.69f, 0.21f);
+        else if (height < 4) dst.set(0.5f, 0.51f, 0.53f);
+        else dst.set(0.9f, 0.9f, 1);
+        return dst;
+//        return new Vector3f(0.15f, 0.69f, 0.21f);
     }
 
     public static MeshData generateRegionMeshShared2(
@@ -179,7 +179,7 @@ public class TerrainGenerator {
         Vertex[] vertices = new Vertex[xUnits * zUnits * 6];
         int[] indices = new int[xUnits * zUnits * 6];
         float plane = -10;
-        float y = plane / 1.0f - 2f;
+        float y = plane - 5f;
         xUnits /= 2f;
         zUnits /= 2f;
         int vx = 0, ix = 0;

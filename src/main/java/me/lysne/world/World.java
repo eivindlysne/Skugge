@@ -32,7 +32,13 @@ public class World {
     public World() {
 
         waterShader = new ShaderProgram("water");
-        waterShader.registerUniforms("reflection", "refraction");
+        waterShader.registerUniforms(
+                "view",
+                "projection",
+                "transform.position",
+                "transform.orientation",
+                "transform.scale"
+        );
 //        waterShader.setUniform("reflection", 0);
 //        waterShader.setUniform("refraction", 1);
 
@@ -110,7 +116,7 @@ public class World {
 
     public void draw(Camera camera, ShaderProgram terrainShader, ShaderProgram screenShader) {
 
-        GL11.glEnable(GL30.GL_CLIP_DISTANCE0);
+//        GL11.glEnable(GL30.GL_CLIP_DISTANCE0);
 
         // TODO: Invert for reflection
         terrainShader.use();
@@ -121,27 +127,37 @@ public class World {
         terrainShader.setUniform("lightColor", light.color);
 
         terrainShader.setUniform("projection", camera.projection);
-
-
-        reflectionBuffer.bind();
-        reflectionBuffer.clear();
-        clipPlane.set(0f, 1f, 0f, -WATER_LEVEL);
-        terrainShader.setUniform("view", camera.mirrorHorizontalPosition(WATER_LEVEL)); // TODO: Probably not correct
-//        terrainShader.setUniform("view", camera.view);
-        terrainShader.setUniform("clipPlane", clipPlane);
-        for (Region region : regions.values())
-            region.drawTerrain(terrainShader);
-
-        refractionBuffer.bind();
-        refractionBuffer.clear();
-        clipPlane.set(0f, -1f, 0f, WATER_LEVEL);
         terrainShader.setUniform("view", camera.view);
-        terrainShader.setUniform("clipPlane", clipPlane);
+
         for (Region region : regions.values())
             region.drawTerrain(terrainShader);
 
-        FramebufferObject.unbindCurrent();
-        GL11.glDisable(GL30.GL_CLIP_DISTANCE0);
+        waterShader.use();
+        waterShader.setUniform("projection", camera.projection);
+        waterShader.setUniform("view", camera.view);
+
+        for (Region region : regions.values())
+            region.drawWater(waterShader);
+
+//        reflectionBuffer.bind();
+//        reflectionBuffer.clear();
+//        clipPlane.set(0f, 1f, 0f, -WATER_LEVEL);
+//        terrainShader.setUniform("view", camera.mirrorHorizontalPosition(WATER_LEVEL)); // TODO: Probably not correct
+////        terrainShader.setUniform("view", camera.view);
+//        terrainShader.setUniform("clipPlane", clipPlane);
+//        for (Region region : regions.values())
+//            region.drawTerrain(terrainShader);
+
+//        refractionBuffer.bind();
+//        refractionBuffer.clear();
+//        clipPlane.set(0f, -1f, 0f, WATER_LEVEL);
+//        terrainShader.setUniform("view", camera.view);
+//        terrainShader.setUniform("clipPlane", clipPlane);
+//        for (Region region : regions.values())
+//            region.drawTerrain(terrainShader);
+//
+//        FramebufferObject.unbindCurrent();
+//        GL11.glDisable(GL30.GL_CLIP_DISTANCE0);
 
 //        for (Region region : regions.values())
 //            region.drawTerrain(terrainShader);
@@ -153,8 +169,8 @@ public class World {
 //        light.draw(terrainShader);
 
 
-        screenShader.use();
-        reflectionBuffer.draw();
+//        screenShader.use();
+//        reflectionBuffer.draw();
 //        refractionBuffer.draw();
 
     }

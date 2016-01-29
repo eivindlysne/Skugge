@@ -66,7 +66,7 @@ public class Mesh {
 
         GL20.glEnableVertexAttribArray(0); // Position
         GL20.glEnableVertexAttribArray(1); // Color
-        GL20.glEnableVertexAttribArray(2); // Location
+        GL20.glEnableVertexAttribArray(2); // Normal
 
         int bytesPerVertex = Vertex.VERTEX_SIZE * Vertex.FLOAT_SIZE;
 
