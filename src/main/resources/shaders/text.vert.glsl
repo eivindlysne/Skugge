@@ -1,4 +1,4 @@
-#version 130
+#version 330 core
 
 uniform mat4 viewProjection;
 uniform mat4 model;

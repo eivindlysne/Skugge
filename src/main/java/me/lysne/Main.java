@@ -59,7 +59,7 @@ public class Main {
 
         font = new Font(Config.FONT_DIR + "signed.fnt");
         testText = new TextMesh("FPS: 00", font, 2, new Vector2f(0, Config.WINDOW_HEIGHT), 12, true)
-                .color(0f, 0f, 0f).build();
+                .color(0.9f, 0.8f, 0.7f).build();
     }
 
     private void destroy() {
