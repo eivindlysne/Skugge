@@ -18,7 +18,8 @@ public class Camera {
             0f,
             Config.WINDOW_WIDTH,
             0f,
-            Config.WINDOW_HEIGHT);
+            Config.WINDOW_HEIGHT
+    );
     public Matrix4f orthoUnit = new Matrix4f().ortho2D(
             0f,
             1f,
@@ -33,7 +34,7 @@ public class Camera {
     private Transform transform = new Transform();
 
     // TODO: Move to config
-    private final float fov = (float) Math.toRadians(70);
+    private final float fov = (float) Math.toRadians(45);
     private final float zNear = 0.01f;
     private final float zFar = 1000;
     private final float aspect = Config.WINDOW_WIDTH / Config.WINDOW_HEIGHT;
@@ -86,14 +87,22 @@ public class Camera {
 
         Vector3f direction = new Vector3f(0, 0, 0);
 
-        if (input.keyDown(GLFW.GLFW_KEY_W)) direction.z -= 1;
-        if (input.keyDown(GLFW.GLFW_KEY_S)) direction.z += 1;
-        if (input.keyDown(GLFW.GLFW_KEY_A)) direction.x -= 1;
-        if (input.keyDown(GLFW.GLFW_KEY_D)) direction.x += 1;
-        if (direction.length() > 0) direction.normalize();
+        if (input.keyDown(GLFW.GLFW_KEY_W))
+            direction.z -= 1;
+        if (input.keyDown(GLFW.GLFW_KEY_S))
+            direction.z += 1;
+        if (input.keyDown(GLFW.GLFW_KEY_A))
+            direction.x -= 1;
+        if (input.keyDown(GLFW.GLFW_KEY_D))
+            direction.x += 1;
+        if (direction.length() > 0)
+            direction.normalize();
 
         direction.rotate(transform.orientation);
-        if (!Config.FLYING) direction.y = 0;
+
+        if (!Config.FLYING)
+            direction.y = 0;
+
         direction.mul(Config.VELOCITY);
         transform.position.add(direction);
 
@@ -108,30 +117,30 @@ public class Camera {
         projection.mul(view, combined);
     }
 
-    public Vector3f getPosition() {
+    public Vector3f position() {
         return transform.position;
     }
 
-    public Quaternionf getOrientation() {
+    public Quaternionf orientation() {
         return transform.orientation;
     }
 
-    public Matrix4f mirrorHorizontalPosition(float mirrorY) {
-
-        Vector3f invertedYposition = tempV1.set(transform.position);
-        invertedYposition.y -= 2 * (invertedYposition.y - mirrorY);
-
-        Quaternionf invertedYRotation = tempQ1.set(transform.orientation);
-        invertedYRotation.rotateY(
-                -((float) Math.asin(2.0 * (
-                        invertedYRotation.x*invertedYRotation.z + invertedYRotation.y*invertedYRotation.w
-                )))
-        );
-
-        Matrix4f invertedView = tempM1.identity();
-        invertedView.scale(tempV2.set(1, 1, 1).div(transform.scale))
-                .mul(tempM2.identity().rotation(invertedYRotation.conjugate()))
-                .mul(tempM2.identity().translate(invertedYposition.negate()));
-        return invertedView;
-    }
+//    public Matrix4f mirrorHorizontalPosition(float mirrorY) {
+//
+//        Vector3f invertedYposition = tempV1.set(transform.position);
+//        invertedYposition.y -= 2 * (invertedYposition.y - mirrorY);
+//
+//        Quaternionf invertedYRotation = tempQ1.set(transform.orientation);
+//        invertedYRotation.rotateY(
+//                -((float) Math.asin(2.0 * (
+//                        invertedYRotation.x*invertedYRotation.z + invertedYRotation.y*invertedYRotation.w
+//                )))
+//        );
+//
+//        Matrix4f invertedView = tempM1.identity();
+//        invertedView.scale(tempV2.set(1, 1, 1).div(transform.scale))
+//                .mul(tempM2.identity().rotation(invertedYRotation.conjugate()))
+//                .mul(tempM2.identity().translate(invertedYposition.negate()));
+//        return invertedView;
+//    }
 }

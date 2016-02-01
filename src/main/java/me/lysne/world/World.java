@@ -6,8 +6,6 @@ import me.lysne.graphics.Transform;
 import me.lysne.graphics.buffer.FramebufferObject;
 import org.joml.Vector3f;
 import org.joml.Vector4f;
-import org.lwjgl.opengl.GL11;
-import org.lwjgl.opengl.GL30;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -89,7 +87,7 @@ public class World {
 
     public void update(final Camera camera) {
 
-        Vector3f camPosition = new Vector3f(camera.getPosition())
+        Vector3f camPosition = new Vector3f(camera.position())
                 .add(Region.REGION_SIZE_X / 2, 0, Region.REGION_SIZE_Z / 2);
 
         int camWorldX = Math.floorDiv((int) camPosition.x, Region.REGION_SIZE_X);

@@ -91,7 +91,7 @@ public class AudioManager {
 
     public void update(final Camera camera, final Input input) {
 
-        Vector3f lPosition = camera.getPosition();
+        Vector3f lPosition = camera.position();
         AL10.alListener3f(AL10.AL_POSITION, lPosition.x, lPosition.y, lPosition.z);
 
         // TODO Velocity and orientation. Lets do default for now
