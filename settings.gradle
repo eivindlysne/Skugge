@@ -1,4 +1,5 @@
 rootProject.name = 'Skugge'
 include 'Engine'
 include 'Game'
+include 'Playground'
 

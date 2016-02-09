@@ -1,4 +1,6 @@
-package me.lysne.engine.graphics;
+package me.lysne.engine.graphics.mesh;
+
+import me.lysne.engine.graphics.Vertex;
 
 public class MeshData {
 
