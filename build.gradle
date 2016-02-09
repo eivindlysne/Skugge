@@ -17,7 +17,7 @@ repositories {
     }
 }
 
-project.ext.jomlVersion = "1.6.8"
+project.ext.jomlVersion = "1.7.0"
 project.ext.lwjglVersion = "3.0.0-SNAPSHOT"
 
 dependencies {
