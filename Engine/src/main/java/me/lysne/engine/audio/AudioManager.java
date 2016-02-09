@@ -67,11 +67,11 @@ public class AudioManager {
         //checkCapabilities();
 
         // Temp
-//        Music m = new Music(
-//                this,
-//                ClassLoader.getSystemResource(Config.MUSIC_DIR + "DiamondQuest.ogg").getFile());
-//        m.play(new Vector3f(0f,0f,0f), false);
-//        playingMusic.add(m);
+        Music m = new Music(
+                this,
+                ClassLoader.getSystemResource(Config.MUSIC_DIR + "DiamondQuest.ogg").getFile());
+        m.play(new Vector3f(0f,0f,0f), false);
+        playingMusic.add(m);
     }
 
     public void destroy() {
@@ -86,7 +86,7 @@ public class AudioManager {
         }
 
         context.destroy();
-        device.destroy();
+        device.close();
     }
 
     public void update(final Camera camera, final Input input) {
@@ -158,7 +158,7 @@ public class AudioManager {
     }
 
     private static void checkErrors(ALContext context) {
-        ALUtil.checkALCError(context.getDevice());
+        ALUtil.checkALCError(context.getDevice().address());
         ALUtil.checkALError();
     }
 
@@ -222,12 +222,12 @@ public class AudioManager {
 
     private static void printDevices(ALContext alContext, long contextDevice, int which, String kind) {
 
-        List<String> devices = ALC.getStringList(contextDevice, which);
-        checkErrors(alContext);
-
-        System.out.println("Available " + kind + " devices: ");
-        for ( String device : devices ) {
-            System.out.println("    " + device);
-        }
+//        List<String> devices = ALC.getStringList(contextDevice, which);
+//        checkErrors(alContext);
+//
+//        System.out.println("Available " + kind + " devices: ");
+//        for ( String device : devices ) {
+//            System.out.println("    " + device);
+//        }
     }
 }

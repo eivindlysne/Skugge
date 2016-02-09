@@ -1,6 +1,7 @@
 package me.lysne.engine.text;
 
 import me.lysne.engine.graphics.Vertex;
+import me.lysne.engine.graphics.types.DrawHint;
 import org.joml.Matrix4f;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
@@ -14,7 +15,7 @@ import java.nio.FloatBuffer;
 
 public class TextMesh {
 
-    private String text;
+    private StringBuilder text;
     private Font font;
     private float fontSize;
     private Vector2f position;
@@ -22,6 +23,8 @@ public class TextMesh {
     private Matrix4f modelMatrix = new Matrix4f();
     private float lineLength;
     private boolean centered;
+
+    private FloatBuffer buffer;
 
     private int vao;
     private int vbo;
@@ -36,7 +39,7 @@ public class TextMesh {
             boolean centered
     ) {
 
-        this.text = text;
+        this.text = new StringBuilder(text);
         this.font = font;
         this.fontSize = fontSize;
         this.position = position;
@@ -57,14 +60,24 @@ public class TextMesh {
         GL15.glDeleteBuffers(vbo);
     }
 
-    public TextMesh build() {
+    private void buildBuffer() {
 
-        FloatBuffer buffer = BufferUtils.createFloatBuffer(drawCount * Glyph.VERTEX_SIZE);
+        drawCount = text.length() * 6;
+        int capacity = drawCount * Glyph.VERTEX_SIZE;
+
+        if (buffer == null || capacity > buffer.capacity()) {
+            buffer = BufferUtils.createFloatBuffer(capacity);
+        } else {
+            buffer.clear();
+            buffer.limit(capacity);
+        }
+
         float cursorX = 0f;
         float cursorY = 0f;
 
-        for (char c : text.toCharArray()) {
+        for (int i = 0; i < text.length(); i++) {
 
+            char c = text.charAt(i);
             if (c == 32) {
                 cursorX += font.spaceWidth();
                 continue;
@@ -76,11 +89,44 @@ public class TextMesh {
         }
 
         buffer.flip();
+    }
+
+    private void updateBuffer() {
+
+        GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, vbo);
+        GL15.glBufferSubData(GL15.GL_ARRAY_BUFFER, 0L, buffer);
+        GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, 0);
+    }
+
+    public void replace(int start, String subString, boolean deleteRemaining) {
+
+        int end = start + subString.length();
+        text.replace(start, end, subString);
+
+        if (deleteRemaining && end < text.length())
+            text.delete(end, text.length());
+
+        buildBuffer();
+        updateBuffer();
+    }
+
+    public void replace(String newText) {
+
+        text.setLength(0);
+        text.append(newText);
+
+        buildBuffer();
+        updateBuffer();
+    }
+
+    public TextMesh build(DrawHint drawHint) {
+
+        buildBuffer();
 
         GL30.glBindVertexArray(vao);
 
         GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, vbo);
-        GL15.glBufferData(GL15.GL_ARRAY_BUFFER, buffer, GL15.GL_STATIC_DRAW);
+        GL15.glBufferData(GL15.GL_ARRAY_BUFFER, buffer, drawHint.value);
 
         GL20.glEnableVertexAttribArray(0);
         GL20.glEnableVertexAttribArray(1);

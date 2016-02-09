@@ -1,9 +1,9 @@
 package me.lysne.game.world;
 
-import me.lysne.engine.graphics.DrawHint;
 import me.lysne.engine.graphics.Mesh;
 import me.lysne.engine.graphics.ShaderProgram;
 import me.lysne.engine.graphics.Transform;
+import me.lysne.engine.graphics.types.DrawHint;
 import me.lysne.engine.pg.TerrainGenerator;
 
 public class Region {

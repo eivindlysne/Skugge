@@ -4,6 +4,7 @@ import me.lysne.engine.Config;
 import me.lysne.engine.audio.AudioManager;
 import me.lysne.engine.graphics.Camera;
 import me.lysne.engine.graphics.ShaderProgram;
+import me.lysne.engine.graphics.types.DrawHint;
 import me.lysne.engine.text.Font;
 import me.lysne.engine.text.TextMesh;
 import me.lysne.engine.window.Display;
@@ -12,6 +13,7 @@ import me.lysne.engine.window.Timer;
 import me.lysne.game.world.World;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
+import org.lwjgl.opengl.GL15;
 
 public class Game {
 
@@ -60,7 +62,7 @@ public class Game {
 
         font = new Font(Config.FONT_DIR + "signed.fnt");
         testText = new TextMesh("FPS: 00", font, 2, new Vector2f(0, Config.WINDOW_HEIGHT), 12, true)
-                .color(0.9f, 0.8f, 0.7f).build();
+                .color(0.9f, 0.8f, 0.7f).build(DrawHint.DYNAMIC);
     }
 
 
@@ -121,6 +123,8 @@ public class Game {
             frameCounter += elapsedTime;
 
             if (frameCounter >= 1.0) {
+
+                testText.replace(5, String.valueOf(frames), true);
 
                 frames = 0;
                 frameCounter = 0.0;

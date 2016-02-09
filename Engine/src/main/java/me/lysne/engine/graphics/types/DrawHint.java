@@ -1,4 +1,4 @@
-package me.lysne.engine.graphics;
+package me.lysne.engine.graphics.types;
 
 import org.lwjgl.opengl.GL15;
 
@@ -8,9 +8,9 @@ public enum DrawHint {
     DYNAMIC(GL15.GL_DYNAMIC_DRAW),
     STREAM(GL15.GL_STREAM_DRAW);
 
-    public int val;
+    public final int value;
 
-    DrawHint(int val) {
-        this.val = val;
+    DrawHint(int value) {
+        this.value = value;
     }
 }
