@@ -2,8 +2,8 @@ package me.lysne.engine.pg;
 
 import me.lysne.engine.Config;
 import me.lysne.engine.graphics.Transform;
-import me.lysne.engine.graphics.Vertex;
 import me.lysne.engine.graphics.mesh.MeshData;
+import me.lysne.engine.graphics.vertex.Vertex;
 import org.joml.Vector3f;
 import org.joml.Vector4f;
 
@@ -36,7 +36,6 @@ public class TerrainGenerator {
         else if (height < 4) dst.set(0.5f, 0.51f, 0.53f);
         else dst.set(0.9f, 0.9f, 1);
         return dst;
-//        return new Vector3f(0.15f, 0.69f, 0.21f);
     }
 
     public static MeshData generateRegionMeshShared2(

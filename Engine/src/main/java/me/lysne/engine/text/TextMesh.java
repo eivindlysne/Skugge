@@ -1,7 +1,7 @@
 package me.lysne.engine.text;
 
-import me.lysne.engine.graphics.Vertex;
 import me.lysne.engine.graphics.types.DrawHint;
+import me.lysne.engine.graphics.vertex.Vertex;
 import org.joml.Matrix4f;
 import org.joml.Vector2f;
 import org.joml.Vector3f;

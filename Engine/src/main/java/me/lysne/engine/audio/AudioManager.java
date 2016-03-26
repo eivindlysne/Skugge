@@ -1,6 +1,5 @@
 package me.lysne.engine.audio;
 
-import me.lysne.engine.Config;
 import me.lysne.engine.graphics.Camera;
 import me.lysne.engine.window.Input;
 import org.joml.Vector3f;
@@ -49,12 +48,12 @@ public class AudioManager {
             sourcesIdle[i] = true;
         }
 
-        // Temp
-        Music m = new Music(
-                this,
-                ClassLoader.getSystemResource(Config.MUSIC_DIR + "DiamondQuest.ogg").getFile());
-        m.play(new Vector3f(0f,0f,0f), false);
-        playingMusic.add(m);
+//        // Temp
+//        Music m = new Music(
+//                this,
+//                ClassLoader.getSystemResource(Config.MUSIC_DIR + "DiamondQuest.ogg").getFile());
+//        m.play(new Vector3f(0f,0f,0f), false);
+//        playingMusic.add(m);
     }
 
     public void destroy() {

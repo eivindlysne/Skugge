@@ -27,7 +27,7 @@ public class Region {
         transform.position.set((coord.x * REGION_SIZE_X), 0, (coord.z * REGION_SIZE_Z));
 
         mesh = new Mesh(
-                TerrainGenerator.generateRegionMesh(this.transform, REGION_SIZE_X, REGION_SIZE_Z, 8f /* Feature size */),
+                TerrainGenerator.generateRegionMeshShared(this.transform, REGION_SIZE_X, REGION_SIZE_Z, 8f /* Feature size */),
                 DrawHint.STATIC
         );
 

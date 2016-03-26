@@ -2,4 +2,6 @@ rootProject.name = 'Skugge'
 include 'Engine'
 include 'Game'
 include 'Playground'
+include 'Renderer'
+findProject(':Renderer')?.name = 'renderer'
 

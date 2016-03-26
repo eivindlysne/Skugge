@@ -1,7 +1,7 @@
 package me.lysne.engine.graphics.mesh;
 
-import me.lysne.engine.graphics.Vertex;
 import me.lysne.engine.graphics.types.DrawHint;
+import me.lysne.engine.graphics.vertex.Vertex;
 import org.joml.Vector3f;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;

@@ -1,4 +1,4 @@
-package me.lysne.engine.graphics;
+package me.lysne.engine.graphics.vertex;
 
 import org.joml.Vector3f;
 
