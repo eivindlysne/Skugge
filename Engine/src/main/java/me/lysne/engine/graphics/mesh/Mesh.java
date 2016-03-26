@@ -1,6 +1,5 @@
 package me.lysne.engine.graphics.mesh;
 
-import me.lysne.engine.graphics.MeshData;
 import me.lysne.engine.graphics.Vertex;
 import me.lysne.engine.graphics.types.DrawHint;
 import org.joml.Vector3f;

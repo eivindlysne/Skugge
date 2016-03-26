@@ -88,10 +88,7 @@ public class Display {
 
     public void destroy() {
 
-        errorCallback.release();
-        keyCallback.release();
-        mouseButtonCallback.release();
-        cursorPosCallback.release();
+        Callbacks.glfwFreeCallbacks(handle);
         glfwDestroyWindow(handle);
     }
 

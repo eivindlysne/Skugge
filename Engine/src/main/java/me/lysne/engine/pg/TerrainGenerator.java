@@ -1,9 +1,9 @@
 package me.lysne.engine.pg;
 
 import me.lysne.engine.Config;
-import me.lysne.engine.graphics.MeshData;
 import me.lysne.engine.graphics.Transform;
 import me.lysne.engine.graphics.Vertex;
+import me.lysne.engine.graphics.mesh.MeshData;
 import org.joml.Vector3f;
 import org.joml.Vector4f;
 

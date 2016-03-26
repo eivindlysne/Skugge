@@ -5,31 +5,23 @@ import me.lysne.engine.graphics.Camera;
 import me.lysne.engine.window.Input;
 import org.joml.Vector3f;
 import org.lwjgl.glfw.GLFW;
+import org.lwjgl.openal.AL;
 import org.lwjgl.openal.AL10;
 import org.lwjgl.openal.ALC;
 import org.lwjgl.openal.ALC10;
-import org.lwjgl.openal.ALC11;
 import org.lwjgl.openal.ALCCapabilities;
-import org.lwjgl.openal.ALCapabilities;
-import org.lwjgl.openal.ALContext;
-import org.lwjgl.openal.ALDevice;
-import org.lwjgl.openal.ALUtil;
-import org.lwjgl.openal.EnumerateAllExt;
+import org.lwjgl.system.MemoryUtil;
 
+import java.nio.ByteBuffer;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 public class AudioManager {
 
     public static final int MAX_SOURCES = 16;
 
-    public static final int DEFAULT_FREQUENCY = 0;
-    public static final int DEFAULT_REFRESH = 0;
-    public static final boolean DEFAULT_SYNC = false;
-
-    private final ALDevice device;
-    private final ALContext context;
+    private long device;
+    private long context;
 
     private final int[] sources = new int[MAX_SOURCES];
     private final boolean[] sourcesIdle = new boolean[MAX_SOURCES];
@@ -37,24 +29,17 @@ public class AudioManager {
     private Set<Music> playingMusic = new HashSet<>();
 
     public AudioManager() {
-        this(null);
-    }
 
-    public AudioManager(String deviceName) {
-        this(deviceName, DEFAULT_FREQUENCY, DEFAULT_REFRESH, DEFAULT_SYNC);
-    }
+        device = ALC10.alcOpenDevice((ByteBuffer) null);
+        if (device == MemoryUtil.NULL)
+            throw new RuntimeException("Failed to open default audio device!");
 
-    public AudioManager(String deviceName, int frequency, int refresh, boolean sync) {
-        // NOTE: Throws runtime exception on failure
-        device = ALDevice.create(deviceName);
-        context = ALContext.create(device, frequency, refresh, sync);
-        checkErrors(context);
+        ALCCapabilities capabilities = ALC.createCapabilities(device);
 
-        if (Config.AUDIO_DEBUG) {
-            printALCInfo(context);
-            printALInfo(context);
-            checkErrors(context);
-        }
+        context = ALC10.alcCreateContext(device, (ByteBuffer) null);
+        ALC10.alcMakeContextCurrent(context);
+
+        AL.createCapabilities(capabilities);
 
         for (int i = 0; i < sources.length; i++) {
             int source = AL10.alGenSources();
@@ -63,8 +48,6 @@ public class AudioManager {
             sources[i] = source;
             sourcesIdle[i] = true;
         }
-
-        //checkCapabilities();
 
         // Temp
         Music m = new Music(
@@ -85,8 +68,8 @@ public class AudioManager {
             AL10.alDeleteSources(source);
         }
 
-        context.destroy();
-        device.close();
+        ALC10.alcDestroyContext(context);
+        ALC10.alcCloseDevice(device);
     }
 
     public void update(final Camera camera, final Input input) {
@@ -144,90 +127,5 @@ public class AudioManager {
     public void unregister(Music music) {
 
         playingMusic.remove(music);
-    }
-
-    // TODO
-    private void checkCapabilities() {
-
-        // AL capabilities
-        ALCapabilities alCapabilities = context.getCapabilities();
-
-
-        // ALC capabilities
-        ALCCapabilities alcCapabilities = device.getCapabilities();
-    }
-
-    private static void checkErrors(ALContext context) {
-        ALUtil.checkALCError(context.getDevice().address());
-        ALUtil.checkALError();
-    }
-
-    private static void printALCInfo(ALContext alContext) {
-        // we're running 1.1, so really no need to query for the 'ALC_ENUMERATION_EXT' extension
-        ALCCapabilities capabilities = ALC.getCapabilities();
-        if (capabilities.ALC_ENUMERATION_EXT) {
-            if (capabilities.ALC_ENUMERATE_ALL_EXT) {
-                printDevices(alContext, 0, EnumerateAllExt.ALC_ALL_DEVICES_SPECIFIER, "playback");
-            } else {
-                printDevices(alContext, 0, ALC10.ALC_DEVICE_SPECIFIER, "playback");
-            }
-            printDevices(alContext, 0, ALC11.ALC_CAPTURE_DEVICE_SPECIFIER, "capture");
-        } else {
-            System.out.println("No device enumeration available");
-        }
-
-        if (capabilities.ALC_ENUMERATE_ALL_EXT) {
-            System.out.println("Default playback device: " + ALC10.alcGetString(0, EnumerateAllExt.ALC_DEFAULT_ALL_DEVICES_SPECIFIER));
-        } else {
-            System.out.println("Default playback device: " + ALC10.alcGetString(0, ALC10.ALC_DEFAULT_DEVICE_SPECIFIER));
-        }
-
-        System.out.println("Default capture device: " + ALC10.alcGetString(0, ALC11.ALC_CAPTURE_DEFAULT_DEVICE_SPECIFIER));
-
-        System.out.println("alContext = " + alContext);
-        System.out.println("alContext.getDevice() = " + alContext.getDevice());
-        int majorVersion = ALC10.alcGetInteger(alContext.getDevice().address(), ALC10.ALC_MAJOR_VERSION);
-        int minorVersion = ALC10.alcGetInteger(alContext.getDevice().address(), ALC10.ALC_MINOR_VERSION);
-        checkErrors(alContext);
-
-        System.out.println("ALC version: " + majorVersion + "." + minorVersion);
-
-        System.out.println("ALC extensions:");
-        String[] extensions = ALC10.alcGetString(alContext.getDevice().address(), ALC10.ALC_EXTENSIONS).split(" ");
-        for (String extension : extensions) {
-            if (extension.trim().isEmpty()) {
-                continue;
-            }
-            System.out.println("    " + extension);
-        }
-        checkErrors(alContext);
-    }
-
-    private static void printALInfo(ALContext alContext) {
-
-        System.out.println("OpenAL vendor string: " + AL10.alGetString(AL10.AL_VENDOR));
-        System.out.println("OpenAL renderer string: " + AL10.alGetString(AL10.AL_RENDERER));
-        System.out.println("OpenAL version string: " + AL10.alGetString(AL10.AL_VERSION));
-        System.out.println("AL extensions:");
-        String[] extensions = AL10.alGetString(AL10.AL_EXTENSIONS).split(" ");
-        for (String extension : extensions) {
-            if (extension.trim().isEmpty()) {
-                continue;
-            }
-            System.out.println("    " + extension);
-        }
-        checkErrors(alContext);
-    }
-
-
-    private static void printDevices(ALContext alContext, long contextDevice, int which, String kind) {
-
-//        List<String> devices = ALC.getStringList(contextDevice, which);
-//        checkErrors(alContext);
-//
-//        System.out.println("Available " + kind + " devices: ");
-//        for ( String device : devices ) {
-//            System.out.println("    " + device);
-//        }
     }
 }
